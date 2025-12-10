@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Live Yoga Pose Accuracy — Yogadarshan AI</title>
+  <style>
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 20px; background-color: #f4f4f9; color: #333; }
+    h2 { color: #4a4a4a; }
+    #main-container { display: flex; flex-wrap: wrap; gap: 20px; }
+    #videoContainer { position: relative; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; background: #000;}
+    video { width: 640px; height: 480px; display: block; }
+    canvas { position: absolute; left: 0; top: 0; pointer-events: none; width: 640px; height: 480px;}
+    #controlsPanel { flex: 1; min-width: 300px; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); height: fit-content; }
+    
+    .control-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 15px;}
+    
+    .btn-group { display: flex; gap: 10px; margin-bottom: 20px;}
+    button { flex: 1; padding: 12px; font-size: 16px; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s; color: white; font-weight: 600;}
+    #startBtn { background-color: #28a745; }
+    #startBtn:hover { background-color: #218838; }
+    #startBtn:disabled { background-color: #94d3a2; cursor: not-allowed; }
+    #stopBtn { background-color: #dc3545; }
+    #stopBtn:hover { background-color: #c82333; }
+    #stopBtn:disabled { background-color: #e4606d; cursor: not-allowed; }
+
+    #scoreDisplay { text-align: center; padding: 20px; background: #e9ecef; border-radius: 8px; }
+    #scoreLabel { font-size: 18px; color: #666; display: block; margin-bottom: 5px;}
+    #scoreVal { font-size: 48px; font-weight: bold; color: #007bff; }
+  </style>
+</head>
+<body>
+  <h2>Yogadarshan AI</h2>
+  
+  <div id="main-container">
+      <div id="videoContainer">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="overlay"></canvas>
+      </div>
+
+      <div id="controlsPanel">
+        <div class="control-group">
+            <label for="poseSelect">Select Target Pose:</label>
+            <select id="poseSelect">
+              <option value="warrior_ii">Warrior II</option>
+              <option value="tree">Tree Pose (Vrksasana)</option>
+              <option value="downward_dog">Downward-Facing Dog</option>
+              <option value="plank">Plank Pose</option>
+              <option value="triangle">Triangle Pose</option>
+              <option value="mountain">Mountain Pose</option>
+              <option value="cobra">Cobra Pose (Bhujangasana)</option>
+            </select>
+        </div>
+
+        <div class="btn-group">
+            <button id="startBtn">Start Camera</button>
+            <button id="stopBtn" disabled>Stop</button>
+        </div>
+
+        <div id="scoreDisplay">
+            <span id="scoreLabel">Overall Accuracy Score</span>
+            <span id="scoreVal">—</span>
+        </div>
+      </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const overlay = document.getElementById('overlay');
+    // Ensure canvas dimensions match video dimensions precisely once metadata loads
+    video.addEventListener('loadedmetadata', () => {
+        overlay.width = video.videoWidth;
+        overlay.height = video.videoHeight;
+    });
+
+    const ctx = overlay.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const scoreVal = document.getElementById('scoreVal');
+    const poseSelect = document.getElementById('poseSelect');
+
+    let stream = null;
+    let captureInterval = null;
+    // FPS determines how often we send frames to the backend.
+    // 2-4 FPS is usually enough for yoga feedback without overloading the server.
+    const FPS = 3; 
+    const SEND_INTERVAL_MS = Math.round(1000 / FPS);
+
+    async function startCamera() {
+      try {
+          stream = await navigator.mediaDevices.getUserMedia({ 
+              video: { width: { ideal: 640 }, height: { ideal: 480 } }, 
+              audio: false 
+          });
+          video.srcObject = stream;
+          await video.play();
+      } catch (e) {
+          console.error("Error accessing camera:", e);
+          alert("Could not access camera. Please allow permissions.");
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+    }
+    
+    async function captureAndSend() {
+      if (!video || video.readyState < 2 || video.paused || video.ended) return;
+
+      // 1. Draw current video frame to an offscreen canvas to grab image data
+      const off = document.createElement('canvas');
+      off.width = video.videoWidth;
+      off.height = video.videoHeight;
+      const offCtx = off.getContext('2d');
+      offCtx.drawImage(video, 0, 0, off.width, off.height);
+
+      // 2. Convert to JPEG base64 URL (0.6 quality is usually sufficient for pose estimation)
+      const dataUrl = off.toDataURL('image/jpeg', 0.6); 
+
+      // 3. Prepare payload with image and currently selected pose
+      const payload = {
+        image: dataUrl,
+        pose: poseSelect.value
+      };
+
+      try {
+        // 4. Send to Django backend
+        // IMPORTANT: Ensure the URL below matches your Django URL configuration name
+        const resp = await fetch("{% url 'pose_analyze_frame' %}", {
+          method: 'POST',
+          // CSRF token is handled by @csrf_exempt in the view for this example. 
+          // In production, you should handle CSRF tokens properly in JS headers.
+          headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) throw new Error(`Server error: ${resp.status}`);
+
+        const json = await resp.json();
+
+        if (json.error) {
+          console.warn("Analysis error:", json.error);
+          scoreVal.innerText = "Err";
+          scoreVal.style.color = "#dc3545"; // Red color for error
+        } else {
+          // 5. Update UI with the score
+          const score = json.overall_score;
+          scoreVal.innerText = score.toFixed(0) + "%";
+          
+          // Visual feedback based on score
+          if (score > 85) scoreVal.style.color = "#28a745"; // Green
+          else if (score > 60) scoreVal.style.color = "#ffc107"; // Yellow
+          else scoreVal.style.color = "#dc3545"; // Red
+          
+          // (Optional) You could also parse `json.per_joint` here to display specific feedback
+          // e.g., "Straighten your back leg more."
+        }
+
+      } catch (err) {
+        console.error("Network error during capture:", err);
+        scoreVal.innerText = "Net Err";
+      }
+    }
+
+    // --- Event Listeners ---
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.disabled = true;
+      startBtn.textContent = "Starting...";
+      await startCamera();
+      startBtn.textContent = "Camera Running";
+      scoreVal.innerText = "..."
+      // Start the loop interval
+      captureInterval = setInterval(captureAndSend, SEND_INTERVAL_MS);
+      stopBtn.disabled = false;
+    });
+
+    stopBtn.addEventListener('click', () => {
+      startBtn.disabled = false;
+      startBtn.textContent = "Start Camera";
+      stopBtn.disabled = true;
+      
+      clearInterval(captureInterval);
+      captureInterval = null;
+      stopCamera();
+      scoreVal.innerText = "—";
+      scoreVal.style.color = "#007bff"; // Reset color
+    });
+
+    // Stop camera if user leaves the page
+    window.addEventListener('beforeunload', () => {
+      if (captureInterval) clearInterval(captureInterval);
+      stopCamera();
+    });
+
+    // Optional: Clear score if the user changes the pose while running
+    poseSelect.addEventListener('change', () => {
+         scoreVal.innerText = "...";
+    });
+  </script>
+</body>
+</html>

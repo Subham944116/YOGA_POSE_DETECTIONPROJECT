@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yogadarshan AI — Complete Yoga Guide</title>
+
+  <style>
+    :root{
+      --bg:#f7faf9; --card:#ffffff; --muted:#6b7280; --accent:#0f766e; --accent-2:#06b6d4;
+      --glass: rgba(255,255,255,0.7);
+    }
+
+    *{box-sizing:border-box}
+    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:linear-gradient(180deg,var(--bg),#eef6f6); color:#0f172a}
+
+    header{background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#fff; padding:28px 18px; display:flex; gap:18px; align-items:center; justify-content:space-between}
+    .brand{display:flex; gap:14px; align-items:center}
+    .logo{width:56px;height:56px;border-radius:12px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-weight:700}
+    h1{font-size:20px;margin:0}
+    header p{margin:0; opacity:0.95}
+
+    nav{display:flex; gap:12px; align-items:center}
+    .btn{background:rgba(255,255,255,0.12); border:0; padding:8px 12px; color:#fff; border-radius:8px; cursor:pointer}
+
+    .container{max-width:1100px;margin:24px auto;padding:18px}
+
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+
+    /* main card */
+    .card{background:var(--card);padding:20px;border-radius:14px;box-shadow:0 6px 20px rgba(15,23,42,0.06)}
+
+    .hero{display:flex;gap:20px;align-items:flex-start}
+    .hero img{width:210px;border-radius:12px;object-fit:cover}
+    .hero .lead{flex:1}
+    .lead h2{margin:0 0 8px 0}
+    .lead p{color:var(--muted);margin:0 0 12px 0}
+
+    /* features */
+    .features{display:flex;gap:10px;flex-wrap:wrap}
+    .feature{flex:1 0 45%;background:linear-gradient(180deg,#fbfeff,#fcffff);border-radius:10px;padding:12px;border:1px solid rgba(15,23,42,0.03)}
+    .feature h4{margin:0 0 6px 0}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* accordion */
+    .accordion .item{border-bottom:1px solid rgba(15,23,42,0.04)}
+    .accordion button{width:100%;text-align:left;padding:14px;background:transparent;border:0;cursor:pointer;font-weight:600}
+    .panel{padding:0 14px 16px 14px;color:var(--muted);display:none}
+
+    /* sidebar */
+    .sidebar .toc{list-style:none;padding:0;margin:0}
+    .toc li{padding:8px 10px;border-radius:8px;margin-bottom:8px;cursor:pointer}
+    .toc li:hover{background:linear-gradient(90deg,rgba(6,182,212,0.08),rgba(15,118,110,0.06))}
+
+    /* badges and chips */
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;background:#f1fdfd;border:1px solid rgba(6,182,212,0.12);font-weight:600;margin-right:8px}
+
+    /* glossary box */
+    .gloss{font-size:14px;color:var(--muted);line-height:1.55}
+
+    footer{max-width:1100px;margin:20px auto;padding:18px;text-align:center;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:980px){.grid{grid-template-columns:1fr}.hero img{display:none}.sidebar{order:-1}}
+
+    /* back to top */
+    #topBtn{position:fixed;right:18px;bottom:18px;border:0;background:var(--accent);color:#fff;padding:10px;border-radius:10px;cursor:pointer;box-shadow:0 6px 20px rgba(15,23,42,0.12)}
+
+    /* dark mode */
+    .dark{--bg:#071523;--card:#071a1f;--muted:#9aa6ad;--accent:#06b6d4;--accent-2:#0ea5b5;color:#e6eef0}
+  </style>
+</head>
+
+<body id="top">
+  <header>
+    <div class="brand">
+      <div class="logo">YD</div>
+      <div>
+        <h1>Yogadarshan AI</h1>
+      </div>
+    </div>
+
+    <nav>
+      <button class="btn" id="toggleDark">Toggle Theme</button>
+      <button class="btn" onclick="document.getElementById('faq').scrollIntoView({behavior:'smooth'})">FAQ</button>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <section class="card">
+        <div class="hero">
+          <div class="lead">
+            <h2>Complete Guide to Yoga — Yogadarshan AI</h2>
+            <p>Explore the philosophy, history, practices, postures (asanas), breathing (pranayama), meditation, benefits, and safety precautions. Interactive sections below help you discover and learn.</p>
+
+            <div style="margin-top:12px">
+              <span class="chip">Beginner</span>
+              <span class="chip">Intermediate</span>
+              <span class="chip">Advanced</span>
+            </div>
+          </div>
+        </div>
+
+        <hr style="margin:18px 0;border:0;height:1px;background:linear-gradient(90deg,transparent,#e6eef0,transparent)">
+
+        <h3 id="what">What is Yoga?</h3>
+        <p class="small">Yoga is both a philosophy and a physical practice originating in ancient India. It encompasses ethical living, breath control, body postures, meditation, and insight — aiming at integrating body, breath, and mind to enhance well-being.</p>
+
+        <div class="features" style="margin-top:16px">
+          <div class="feature">
+            <h4>Philosophy</h4>
+            <p class="small">Roots in the Yoga Sutras of Patanjali, the Bhagavad Gita, and the Upanishads. Themes: self-discipline (tapas), non-attachment (vairagya), and awareness (dharana).</p>
+          </div>
+
+          <div class="feature">
+            <h4>Practice Elements</h4>
+            <p class="small">Includes yamas & niyamas (ethical rules), asanas (postures), pranayama (breath work), pratyahara (sense withdrawal), dharana (concentration), dhyana (meditation), and samadhi (absorption).</p>
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px">History & Origins</h3>
+        <p class="small">Yoga's origins trace back over 3,000 years in the Indian subcontinent. Early practices were meditative; asanas became more central later. Over centuries yoga evolved into many schools and lineages, both traditional and modern.</p>
+
+        <h3 style="margin-top:18px">Major Branches of Yoga</h3>
+        <div class="accordion" id="branches">
+          <div class="item">
+            <button onclick="togglePanel(event)">Hatha Yoga — Foundation of physical practice</button>
+            <div class="panel">Hatha focuses on basic postures (asanas) and breath (pranayama). It's ideal for beginners to build strength and flexibility.</div>
+          </div>
+
+          <div class="item">
+            <button onclick="togglePanel(event)">Vinyasa & Flow — Movement with breath</button>
+            <div class="panel">Dynamic sequences linking breath to movement, often faster-paced and cardiovascular.</div>
+          </div>
+
+          <div class="item">
+            <button onclick="togglePanel(event)">Ashtanga — Structured sequence</button>
+            <div class="panel">A defined series of poses practiced in the same order. Demanding but great for discipline and strength.</div>
+          </div>
+
+          <div class="item">
+            <button onclick="togglePanel(event)">Kundalini — Energetic & chanting</button>
+            <div class="panel">Focuses on awakening energy at the base of the spine using breath, movement, and mantra.</div>
+          </div>
+
+          <div class="item">
+            <button onclick="togglePanel(event)">Yin & Restorative — Slow deep release</button>
+            <div class="panel">Long-held passive stretches (Yin) and supported rests (Restorative) targeting connective tissue and deep relaxation.</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px">Core Practices</h3>
+        <ul>
+          <li><strong>Asanas (Postures):</strong> Align the body to improve strength, balance, and flexibility.</li>
+          <li><strong>Pranayama (Breathwork):</strong> Techniques like Ujjayi, Nadi Shodhana (alternate nostril), Kapalabhati to regulate prana (life force).</li>
+          <li><strong>Meditation & Mindfulness:</strong> Practices to cultivate concentration and awareness.</li>
+          <li><strong>Yamas & Niyamas:</strong> Ethical guidelines for living (e.g., non-violence, truthfulness, contentment).</li>
+        </ul>
+
+        <h3 style="margin-top:18px">Popular Asanas (with short cues)</h3>
+        <div class="accordion" id="poses">
+          <div class="item"><button onclick="togglePanel(event)">Tadasana — Mountain Pose</button><div class="panel">Stand tall, feet together, root through heels, lift through crown of head, soften shoulders.</div></div>
+          <div class="item"><button onclick="togglePanel(event)">Vrikshasana — Tree Pose</button><div class="panel">Shift weight to one foot, place sole on inner thigh/calf, keep hips level, gaze steady.</div></div>
+          <div class="item"><button onclick="togglePanel(event)">Adho Mukha Svanasana — Downward Dog</button><div class="panel">Hands shoulder-width, hips lift, lengthen spine, pedal heels for hamstring stretch.</div></div>
+          <div class="item"><button onclick="togglePanel(event)">Bhujangasana — Cobra</button><div class="panel">Lengthen through spine, lift chest using back muscles, keep elbows slightly bent.</div></div>
+          <div class="item"><button onclick="togglePanel(event)">Padmasana — Lotus</button><div class="panel">Sit with crossed legs, place each foot on opposite thigh (advanced). Use props if needed.</div></div>
+        </div>
+
+        <h3 style="margin-top:18px">Benefits of Regular Practice</h3>
+        <ul>
+          <li>Improved flexibility, strength, and posture</li>
+          <li>Reduced stress, anxiety, and improved mood</li>
+          <li>Better sleep, concentration, and respiratory health</li>
+          <li>Supports joint health and injury prevention when practised mindfully</li>
+        </ul>
+
+        <h3 style="margin-top:18px">Safety & Precautions</h3>
+        <p class="small">Always listen to your body. Avoid forcing into postures. Consult a healthcare professional for chronic conditions, pregnancy, or recent surgery. Use props (blocks, straps, bolsters) and modify poses to avoid strain.</p>
+
+        <h3 style="margin-top:18px">How Yogadarshan AI Helps</h3>
+        <p class="small">Yogadarshan AI uses pose detection to compare your alignment with ideal models, scoring deviations, and offering corrective cues — which can speed up learning and reduce risk of injury.</p>
+
+        <hr>
+
+        <h3 id="faq">Frequently Asked Questions</h3>
+        <div class="accordion" id="faqs">
+          <div class="item"><button onclick="togglePanel(event)">How often should I practice?</button><div class="panel">Start with 3 times a week for 20–30 minutes. Gradually increase frequency and duration as your body adapts.</div></div>
+          <div class="item"><button onclick="togglePanel(event)">Do I need to be flexible?</button><div class="panel">No. Yoga builds flexibility gradually. Use modifications and props; focus on consistency.</div></div>
+          <div class="item"><button onclick="togglePanel(event)">Can yoga help with weight loss?</button><div class="panel">Yes, particularly dynamic styles like Vinyasa or power yoga combined with a healthy diet; but yoga's primary benefits include mobility and stress relief.</div></div>
+        </div>
+
+      </section>
+
+      <aside class="sidebar">
+        <div class="card" style="position:sticky;top:22px">
+          <h4 style="margin-top:0">Quick Navigation</h4>
+          <ul class="toc">
+            <li onclick="scrollToId('what')">What is Yoga?</li>
+            <li onclick="scrollToId('branches')">Branches of Yoga</li>
+            <li onclick="scrollToId('poses')">Popular Asanas</li>
+            <li onclick="scrollToId('faq')">FAQ</li>
+          </ul>
+
+          <hr style="margin:12px 0">
+
+          <h4>Glossary</h4>
+          <div class="gloss">
+            <p><strong>Asana:</strong> Physical posture.</p>
+            <p><strong>Pranayama:</strong> Breath control practices.</p>
+            <p><strong>Dhyana:</strong> Meditation.</p>
+            <p><strong>Yama/Niyama:</strong> Ethical guidelines.</p>
+          </div>
+
+          <hr style="margin:12px 0">
+
+          <h4>Tips for Beginners</h4>
+          <ol style="margin:0;padding-left:18px;color:var(--muted)">
+            <li>Warm up gently before deeper stretches.</li>
+            <li>Practice with intention, not speed.</li>
+            <li>Use blocks and straps for support.</li>
+            <li>Focus on breath coordination.</li>
+            <li>Keep a practice journal to track progress.</li>
+          </ol>
+
+          <hr style="margin:12px 0">
+          <button onclick="openModal()" style="width:100%;padding:10px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;cursor:pointer">Start Guided Mini-Session</button>
+
+        </div>
+      </aside>
+    </div>
+
+
+    <!-- guided modal -->
+    <div id="modal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);align-items:center;justify-content:center;padding:20px">
+      <div style="background:var(--card);padding:18px;border-radius:12px;max-width:700px;width:100%;box-shadow:0 20px 60px rgba(2,6,23,0.4)">
+        <h3 style="margin-top:0">5-minute Guided Breath & Stretch</h3>
+        <p class="small">Follow this short routine: 1) Sit tall — 1 min breathing (4 in, 4 hold, 4 out). 2) Neck rolls & shoulder rolls — 1 min. 3) Cat-Cow slow flow — 1.5 min. 4) Seated forward fold gentle — 1.5 min.</p>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+          <button onclick="closeModal()" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(15,23,42,0.06);background:transparent;cursor:pointer">Close</button>
+          <button onclick="startSession()" style="padding:8px 12px;border-radius:8px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;cursor:pointer">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- session box -->
+    <div id="sessionBox" style="display:none;position:fixed;right:18px;bottom:18px;background:var(--card);padding:14px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.15);width:280px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Guided Session</strong>
+        <button onclick="endSession()" style="border:0;background:transparent;cursor:pointer">✕</button>
+      </div>
+      <p id="sessionText" style="margin:8px 0;color:var(--muted)"></p>
+    </div>
+
+  </main>
+
+  <button id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">Top</button>
+
+  <footer>
+  </footer>
+
+  <script>
+    // Accordion toggle
+    function togglePanel(e){
+      const btn = e.currentTarget;
+      const panel = btn.nextElementSibling;
+      const open = panel.style.display === 'block';
+      // close others in same container
+      const container = btn.parentElement.parentElement;
+      Array.from(container.querySelectorAll('.panel')).forEach(p=>{if(p!==panel)p.style.display='none'});
+      panel.style.display = open ? 'none' : 'block';
+    }
+
+    // navigation
+    function scrollToId(id){
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    // Modal
+    function openModal(){ document.getElementById('modal').style.display='flex'; }
+    function closeModal(){ document.getElementById('modal').style.display='none'; }
+
+    // Guided session
+    let sessionTimer = null;
+    function startSession(){
+      closeModal();
+      const box = document.getElementById('sessionBox');
+      const text = document.getElementById('sessionText');
+      box.style.display='block';
+      const steps = [
+        'Sit tall. Inhale 4s, hold 4s, exhale 4s — repeat for 60s',
+        'Neck rolls & shoulder rolls — 60s',
+        'Cat-Cow gentle flow — 90s',
+        'Seated forward fold (gentle) — 90s',
+        'Finish by taking 3 slow breaths and noticing sensation — done'
+      ];
+      let i=0; text.innerText = steps[i];
+      sessionTimer = setInterval(()=>{ i++; if(i>=steps.length){ endSession(); return;} text.innerText = steps[i]; }, 60000);
+    }
+    function endSession(){ clearInterval(sessionTimer); document.getElementById('sessionBox').style.display='none'; }
+
+    // Dark mode toggle
+    const toggle = document.getElementById('toggleDark');
+    toggle.addEventListener('click', ()=>{ document.body.classList.toggle('dark'); });
+
+    // Smooth reveal for panels on load (open first items)
+    document.addEventListener('DOMContentLoaded', ()=>{
+      // open first branch
+      const firstPanel = document.querySelector('#branches .panel'); if(firstPanel) firstPanel.style.display='block';
+      const firstPose = document.querySelector('#poses .panel'); if(firstPose) firstPose.style.display='block';
+    });
+  </script>
+</body>
+</html>

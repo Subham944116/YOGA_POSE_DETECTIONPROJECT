@@ -1,0 +1,162 @@
+
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Yogadarshan (Upload)</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 1rem;
+        }
+
+        .stage {
+            max-width: 720px;
+        }
+
+        input[type=file] {
+            font-size: 1rem;
+        }
+
+        img.preview {
+            max-width: 640px;
+            display: block;
+            margin-top: 0.5rem;
+            border: 1px solid #ccc;
+        }
+
+        #result {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            max-width: 640px;
+            min-height: 3rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .muted {
+            color: #666;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stage">
+        <h1>Yogadarshan (Upload)</h1>
+        <p class="muted">Choose a photo of a yoga pose from your device and click <strong>Upload & Detect</strong>. The
+            server expects a data URL in the <code>image</code></p>
+
+        <label for="fileInput">Select image</label>
+        <input id="fileInput" type="file" accept="image/*" aria-describedby="fileHelp">
+        <div id="fileHelp" class="muted">JPEG/PNG recommended. Max ~5MB.</div>
+
+        <img id="preview" class="preview" alt="Selected image preview" style="display:none;" />
+
+        <div>
+            <button id="uploadBtn" disabled>Upload & Detect</button>
+        </div>
+
+        <div id="result" role="status" aria-live="polite"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const preview = document.getElementById('preview');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const resultDiv = document.getElementById('result');
+
+        let currentDataUrl = null;
+
+        // helper to read csrftoken cookie (works with default Django csrftoken name)
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]+)'));
+            return match ? decodeURIComponent(match[2]) : null;
+        }
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) {
+                preview.style.display = 'none';
+                uploadBtn.disabled = true;
+                currentDataUrl = null;
+                return;
+            }
+
+            // Basic client-side size check
+            const maxBytes = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxBytes) {
+                resultDiv.textContent = 'File too large. Please select an image under 5 MB.';
+                preview.style.display = 'none';
+                uploadBtn.disabled = true;
+                currentDataUrl = null;
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                currentDataUrl = reader.result; // data:image/..;base64,...
+                preview.src = currentDataUrl;
+                preview.style.display = 'block';
+                uploadBtn.disabled = false;
+                resultDiv.textContent = '';
+            };
+            reader.onerror = (e) => {
+                resultDiv.textContent = 'Failed to read file.';
+                preview.style.display = 'none';
+                uploadBtn.disabled = true;
+                currentDataUrl = null;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        uploadBtn.addEventListener('click', async () => {
+            if (!currentDataUrl) return;
+            resultDiv.textContent = 'Uploading image...';
+            uploadBtn.disabled = true;
+            try {
+                const csrftoken = getCookie('csrftoken');
+                const form = new FormData();
+                // The backend expects the image as a data URL string in POST['image']
+                form.append('image', currentDataUrl);
+                // optional: indicate non-stream mode
+                form.append('stream', '0');
+
+                const resp = await fetch('/detect/', {
+                    method: 'POST',
+                    headers: csrftoken ? { 'X-CSRFToken': csrftoken } : {},
+                    body: form
+                });
+
+                if (!resp.ok) {
+                    const text = await resp.text();
+                    resultDiv.textContent = 'Server error: ' + resp.status + ' — ' + text;
+                    uploadBtn.disabled = false;
+                    return;
+                }
+
+                const json = await resp.json();
+                if (json.error) {
+                    resultDiv.textContent = 'Error: ' + json.error;
+                } else if (json.pose === null) {
+                    resultDiv.textContent = 'No pose detected: ' + (json.message || '');
+                } else {
+                    resultDiv.innerHTML = '<strong>Detected:</strong> ' + json.pose_name + '<br/>' + json.description;
+                }
+            } catch (e) {
+                resultDiv.textContent = 'Request failed: ' + e.message;
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>
