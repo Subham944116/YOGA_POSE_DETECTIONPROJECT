@@ -28,21 +28,7 @@ Quick start:
    ```
 4. Open http://127.0.0.1:8000/ in your browser, allow camera access, and click "Capture".
 
-Notes:
-- The pose detection logic in `yoga_app/views.py` uses a very naive heuristic on MediaPipe landmarks
-  to **guess** a pose. This is for demo purposes — for a production-ready model you should:
-    - Collect labeled images for each yoga pose and train a classifier (TensorFlow/PyTorch).
-    - Or improve heuristics with more robust rules and thresholds.
-- This project is intentionally minimal so you can run and iterate quickly.
+ 
+ 
 
-Files included:
-- manage.py
-- yoga_pose_project/ (Django settings & wsgi)
-- yoga_app/ (views, urls, templates)
-- requirements.txt
-- README.md
-
-If you want, I can:
-- Add a simple TensorFlow-based classifier stub and training script.
-- Convert the app to use WebSockets for live-streaming frames.
-- Package a Dockerfile for easier environment setup.
+ 
